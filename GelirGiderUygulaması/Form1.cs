@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using OfficeOpenXml;
 using System.Data;
 
@@ -46,17 +47,15 @@ namespace GelirGiderUygulaması
 
         private void BtnExcel_Click(object sender, EventArgs e)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; 
-
             using (var saveFileDialog = new SaveFileDialog() { Filter = "Excel Dosyası|*.xlsx" })
             {
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    using (var package = new ExcelPackage())
+                    using (var workbook = new XLWorkbook())
                     {
-                        var sheet = package.Workbook.Worksheets.Add("GelirGider");
-                        sheet.Cells["A1"].LoadFromDataTable(_tablo, true);
-                        File.WriteAllBytes(saveFileDialog.FileName, package.GetAsByteArray());
+                        var worksheet = workbook.Worksheets.Add("GelirGider");
+                        worksheet.Cell(1, 1).InsertTable(_tablo); // _tablo burada DataTable olarak varsayılıyor.
+                        workbook.SaveAs(saveFileDialog.FileName);
                         MessageBox.Show("Veriler Excel dosyasına aktarıldı.");
                     }
                 }
